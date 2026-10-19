@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>关于我们 - Mitce机场</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif; background: #F4F6F9; color: #0F172A; line-height: 1.7; }
+    .container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+    .header { margin-bottom: 30px; border-bottom: 2px solid #E2E8F0; padding-bottom: 20px; }
+    .back-link { display: inline-block; margin-bottom: 15px; color: #EA580C; font-weight: 700; text-decoration: none; }
+    h1 { font-size: 32px; font-weight: 900; margin-bottom: 8px; font-style: italic; }
+    .section-card { background: #FFFFFF; border-radius: 8px; padding: 32px; border: 1px solid #E2E8F0; margin-bottom: 24px; }
+    .section-card h2 { font-size: 20px; font-weight: 800; margin-bottom: 14px; color: #0F172A; border-left: 4px solid #EA580C; padding-left: 12px; }
+    .section-card p { color: #334155; margin-bottom: 14px; font-size: 15px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 14px; }
+    .node-item { background: #F8FAFC; padding: 14px; border-radius: 6px; border: 1px solid #E2E8F0; }
+    .node-item strong { display: block; color: #0F172A; margin-bottom: 4px; font-size: 14px; }
+    .node-item span { color: #64748B; font-size: 13px; }
+    footer { text-align: center; padding: 30px 0; color: #64748B; font-size: 14px; }
+    footer a { color: #334155; text-decoration: none; margin: 0 10px; font-weight: 600; }
+    footer a:hover { color: #EA580C; }
+    @media(max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <a href="index.html" class="back-link">&larr; 返回 Mitce机场 首页</a>
+      <h1>关于我们</h1>
+      <p style="color: #64748B;">了解 Mitce机场 的技术起源、服务初心与全球网络基建</p>
+    </div>
+
+    <!-- 品牌介绍 -->
+    <div class="section-card">
+      <h2>品牌介绍</h2>
+      <p>Mitce机场 是一家专注于为全球华语用户与涉外专业人士提供高性能跨境网络加速的专线服务商。面对复杂的跨洋网络波动与公共节点的拥挤拥塞，Mitce机场 通过底层硬件链路改造、精选纯净 BGP 与 IPLC 骨干走廊，构建了一套低延迟、高抗封锁、低抖动的网络加速管道。</p>
+      <p>自创办以来，我们坚持以技术与口碑为基石，拒绝低价劣质超卖线路，持续为学术研究者、海外流媒体发烧友、跨境电商运营团队以及 AI 大模型创作者提供坚实流畅的连接保障。</p>
+    </div>
+
+    <!-- 服务理念 -->
+    <div class="section-card">
+      <h2>服务理念</h2>
+      <p><strong>技术立本，极致低阻：</strong>将超音速空气动力学的工程思想引入数据包路由调度，追求毫秒级响应与近乎理论极限的低延迟。</p>
+      <p><strong>透明守正，用户第一：</strong>清晰透明的带宽承诺与配额划分，坚决杜绝后台限速与虚假节点标定，把选择权与知情权完整交还用户。</p>
+      <p><strong>隐私无痕，安全自律：</strong>严格贯彻零访问日志留存准则，尊重并守护每一位用户的数字自由与隐私安全。</p>
+    </div>
+
+    <!-- 节点覆盖 -->
+    <div class="section-card">
+      <h2>全球节点覆盖</h2>
+      <p>Mitce机场 部署了遍布全球主要互联交换中心的优质接入点，并实现端到端物理专线无公网回源：</p>
+      <div class="grid-2">
+        <div class="node-item">
+          <strong>亚太核心枢纽 (香港 / 台湾)</strong>
+          <span>直连内网 IPLC 专线，平均时延 18-28ms，超清视频秒级直达。</span>
+        </div>
+        <div class="node-item">
+          <strong>东亚与东南亚 (日本 / 新加坡)</strong>
+          <span>原生家宽及优质商宽 IP 资源，深度适配各大海外流媒体与游戏平台。</span>
+        </div>
+        <div class="node-item">
+          <strong>北美骨干中枢 (美西洛杉矶 / 美东硅谷)</strong>
+          <span>超大容积 10Gbps+ 管道直达，针对主流 AI 模型机房与全球学术数据库直通。</span>
+        </div>
+        <div class="node-item">
+          <strong>欧洲与海外扩展 (英国 / 德国)</strong>
+          <span>覆盖欧洲合规与商贸节点，提供稳定双向加密传输保障。</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 客户支持 -->
+    <div class="section-card">
+      <h2>客户支持与技术运维</h2>
+      <p>我们深知稳定与时效对于用户的重要性。Mitce机场 配备了 7x24 小时全天候自动化监控探针，并在用户后台开设了专属技术工单与在线客服通道：</p>
+      <p>• <strong>全自动订阅更新：</strong>支持主流客户端一键同步配置，线路节点智能测速排序。</p>
+      <p>• <strong>快速人工排障：</strong>针对特殊网络环境或终端客户端设置难题，工程师团队提供细致耐心的问题指导与协同排查。</p>
+    </div>
+
+    <footer>
+      <p>
+        <a href="sitemap.html">网站地图</a> | 
+        <a href="about.html">关于我们</a> | 
+        <a href="terms.html">服务条款</a> | 
+        <a href="privacy.html">隐私政策</a>
+      </p>
+      <p style="margin-top: 10px;">&copy; 2026 Mitce机场 版权所有.</p>
+    </footer>
+  </div>
+</body>
+</html>

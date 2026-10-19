@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>家庭软路由OpenWrt全屋分流方案：透明代理与策略路由避坑实录 - 航线速报</title>
+  <meta name="description" content="手把手指导家庭软路由OpenWrt旁路由网络拓扑规划，详解透明代理、策略路由分流规则与防止国内流量绕路的最佳避坑实操指南。">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --aero-bg: #F4F6F9;
+      --aero-surface: #FFFFFF;
+      --aero-slate: #0F172A;
+      --aero-slate-soft: #334155;
+      --aero-muted: #64748B;
+      --aero-orange: #EA580C;
+      --aero-orange-hover: #C2410C;
+      --aero-silver: #CBD5E1;
+      --aero-border: #E2E8F0;
+      --aero-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif;
+    }
+    body { font-family: var(--aero-font); background: var(--aero-bg); color: var(--aero-slate); line-height: 1.8; -webkit-font-smoothing: antialiased; }
+    a, a:visited { color: var(--aero-orange); text-decoration: underline; font-weight: 700; transition: color 0.15s ease; }
+    a:hover { color: var(--aero-orange-hover); }
+    .aero-container { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+    .aero-masthead { background: var(--aero-surface); border-bottom: 2px solid var(--aero-border); position: sticky; top: 0; z-index: 100; overflow: hidden; }
+    .aero-header-anim { position: absolute; inset: 0; pointer-events: none; z-index: 0; }
+    .aero-header-streak { position: absolute; height: 1.5px; background: linear-gradient(90deg, transparent, rgba(234, 88, 12, 0.35), transparent); border-radius: 999px; animation: aeroHeaderDrift 4s linear infinite; }
+    @keyframes aeroHeaderDrift { 0% { transform: translateX(110vw); opacity: 0; } 20% { opacity: 0.8; } 80% { opacity: 0.8; } 100% { transform: translateX(-30vw); opacity: 0; } }
+    .aero-nav-row { display: flex; justify-content: space-between; align-items: center; height: 72px; }
+    .aero-nav-links { display: flex; gap: 24px; font-size: 15px; font-weight: 600; }
+    .aero-nav-links a, .aero-nav-links a:visited { color: var(--aero-slate-soft); text-decoration: none; }
+    .aero-nav-links a:hover { color: var(--aero-orange); }
+    .article-wrap { background: #FFFFFF; border: 1px solid var(--aero-border); border-radius: 8px; padding: 48px; margin: 40px auto; box-shadow: 0 4px 16px rgba(15,23,42,0.03); }
+    .crumb { font-size: 13px; color: var(--aero-muted); margin-bottom: 20px; }
+    .crumb a, .crumb a:visited { color: var(--aero-muted); text-decoration: none; font-weight: normal; }
+    .crumb a:hover { color: var(--aero-orange); }
+    h1 { font-size: 32px; font-weight: 900; line-height: 1.3; color: var(--aero-slate); margin-bottom: 16px; font-style: italic; }
+    .meta-bar { display: flex; gap: 20px; font-size: 13px; color: var(--aero-muted); padding-bottom: 24px; border-bottom: 1px solid var(--aero-border); margin-bottom: 32px; }
+    h2 { font-size: 22px; font-weight: 800; color: var(--aero-slate); margin: 36px 0 16px; border-left: 4px solid var(--aero-orange); padding-left: 14px; }
+    h3 { font-size: 18px; font-weight: 700; color: var(--aero-slate-soft); margin: 26px 0 12px; }
+    p { margin-bottom: 18px; font-size: 15px; color: var(--aero-slate-soft); text-align: justify; }
+    ul, ol { margin-bottom: 20px; padding-left: 24px; color: var(--aero-slate-soft); font-size: 15px; }
+    li { margin-bottom: 8px; }
+    .aero-hangar-footer { background: var(--aero-slate); color: #FFFFFF; padding: 50px 0 35px; border-top: 4px solid var(--aero-orange); margin-top: 60px; }
+    .aero-footer-nav { display: flex; justify-content: center; gap: 40px; margin-bottom: 24px; flex-wrap: wrap; }
+    .aero-footer-nav a, .aero-footer-nav a:visited { font-size: 15px; font-weight: 700; color: var(--aero-silver); text-decoration: none; }
+    .aero-footer-nav a:hover { color: #F97316; }
+    .aero-footer-copy { text-align: center; font-size: 13px; color: var(--aero-muted); }
+    @media (max-width: 768px) {
+      .aero-nav-row { flex-wrap: wrap; height: auto; padding: 12px 0; gap: 8px; }
+      .aero-brand-link svg { max-width: 135px; height: auto; }
+      .aero-nav-links {
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        width: 100%;
+        gap: 8px;
+        padding: 6px 0 2px;
+        border-top: 1px solid var(--aero-border);
+        -webkit-overflow-scrolling: touch;
+      }
+      .aero-nav-links a {
+        font-size: 13px;
+        padding: 6px 12px;
+        background: #F1F5F9;
+        border-radius: 4px;
+        border: 1px solid var(--aero-border);
+        color: var(--aero-slate);
+        flex-shrink: 0;
+      }
+      .aero-nav-links a:hover {
+        background: var(--aero-orange-soft);
+        color: var(--aero-orange);
+      }
+    }
+    @media (max-width: 640px) { .article-wrap { padding: 24px; } h1 { font-size: 24px; } }
+  </style>
+</head>
+<body>
+
+  <header class="aero-masthead">
+    <div class="aero-header-anim" aria-hidden="true">
+      <div class="aero-header-streak" style="top: 25%; width: 240px; animation-duration: 3.5s;"></div>
+      <div class="aero-header-streak" style="top: 75%; width: 360px; animation-duration: 4.8s; animation-delay: 1.2s;"></div>
+    </div>
+    <div class="aero-container" style="position: relative; z-index: 1;">
+      <div class="aero-nav-row">
+        <a href="index.html" class="aero-brand-link" title="Mitce机场">
+          <svg width="200" height="38" viewBox="0 0 220 42" fill="none">
+            <g transform="skewX(-10)">
+              <path d="M4 22L24 6L18 22L24 36L4 22Z" fill="#EA580C"/>
+              <path d="M16 22L32 10L28 22L32 32L16 22Z" fill="#F97316"/>
+              <line x1="38" y1="22" x2="65" y2="22" stroke="#EA580C" stroke-width="3"/>
+              <text x="68" y="29" font-family="-apple-system, sans-serif" font-size="21" font-weight="900" fill="#0F172A">MITCE</text>
+              <text x="144" y="29" font-family="-apple-system, sans-serif" font-size="18" font-weight="900" fill="#EA580C">机场</text>
+            </g>
+          </svg>
+        </a>
+        <div class="aero-nav-links">
+          <a href="index.html#features">表现力</a>
+          <a href="index.html#streaming">载荷支持</a>
+          <a href="index.html#pricing">订购方案</a>
+          <a href="index.html#faq">常见问答</a>
+          <a href="telemetry.html">航线速报</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="aero-container">
+    <div class="article-wrap">
+      <div class="crumb">
+        <a href="index.html">首页</a> &gt; <a href="telemetry.html">航线速报</a> &gt; 正文
+      </div>
+
+      <h1>家庭软路由OpenWrt全屋分流方案：透明代理与策略路由避坑实录</h1>
+      
+      <div class="meta-bar">
+        <span>作者：嵌入式网络实验室</span>
+        <span>发布日期：2026-10-12</span>
+        <span>分类：家庭网络</span>
+        <span>阅读时长：约 6 分钟</span>
+      </div>
+
+      <p>为家里的 Apple TV、PS5 游戏机、手机与智能电视分别安装配置客户端不仅极为繁琐，且某些设备根本无法运行代理软件。搭建一台基于 x86 或 ARM 架构的 OpenWrt 软路由作为家庭旁路网关，实现全局透明分流，是目前高端数码玩家最推崇的终极组网方案。在吸收了众多网络工程经验与<a href="https://tizilab.net/" target="_blank">专业梯子推荐测评博客</a>的避坑实录后，本文系统总结了一套兼具高稳定性与低运维负担的家庭旁路由网络架构。</p>
+
+      <h2>一、旁路由模式与主路由拨号的黄金搭档</h2>
+      <p>很多新手初次接触软路由时喜欢用软路由直接替代硬路由进行 PPPoE 拨号（单臂主路由）。一旦软路由系统死机或内核崩溃，全家网络立刻陷入瘫痪，排障极其痛苦。更加推荐且容灾性极强的方案是“硬路由主拨号 + 软路由旁挂网关”。</p>
+
+      <h3>1. 旁路由网络拓扑规划</h3>
+      <p>硬路由（如小米、华硕）保持原有拨号与 DHCP 分发，IP 设为 <code>192.168.1.1</code>；软路由仅插一根网线接入硬路由 LAN 口，配置静态 IP <code>192.168.1.2</code>，并将网关和 DNS 指向硬路由 <code>192.168.1.1</code>。</p>
+
+      <h3>2. 按需分流的优雅设定</h3>
+      <p>对于需要科学出海的设备（如 Apple TV），只需在设备的网络设置中将默认网关手动改成 <code>192.168.1.2</code>。而家中长辈的手机和普通智能家居依然保留默认网关，完全不经过旁路由内核处理，互不干扰。</p>
+
+      <h2>二、防止流量绕路与网络回环的关键配置</h2>
+      <p>配置旁路由时最容易犯的错误就是出现“网络回环”或“二次 NAT”，导致国内下载速率直接折半。</p>
+
+      <h3>1. 接口设置中关闭额外 DHCP</h3>
+      <p>必须在 OpenWrt 的 LAN 接口设置中彻底勾选“忽略此接口”（关闭 DHCP 服务），坚决避免同一个局域网内存在两个冲突的 DHCP 服务器。</p>
+
+      <h3>2. 防火墙动态伪装（MASQUERADE）的取舍</h3>
+      <p>在 OpenWrt 防火墙中添加自定义规则 <code>iptables -t nat -I POSTROUTING -o eth0 -j MASQUERADE</code> 可以解决很多跨网段通信问题，但这会导致客户端真实 IP 被改写。若主路由支持静态路由下发，优先建议配置静态路由实现原生数据直通，保留客户端源 IP 便于日志统计与局域网互访。</p>
+
+      <h3>3. 警惕 IPv6 泄漏引发的意外直连</h3>
+      <p>很多家庭宽带在默认情况下已开通了公网 IPv6 地址。如果旁路由没有配置完善的 IPv6 代理接管链，很多支持双栈协议的应用（如谷歌、YouTube）会优先通过本地硬路由的直连 IPv6 通道发起连接，导致代理规则被无感绕过并引发 DNS 泄漏。因此，在旁路由分流环境中，强烈建议在 OpenWrt 的网络接口中关闭 IPv6 ULA 前缀分发，或者直接在插件设置中开启“禁用 IPv6 解析”，强制所有对外流量收敛至经过策略过滤的 IPv4 通道中。</p>
+
+      <h2>三、总结</h2>
+      <p>通过科学规划旁路由架构，整套家庭网络在拥有全屋无感跨境分流能力的同时，依然保持了出色的冗余鲁棒性，是享受智慧家庭数字生活的理想基石。</p>
+    </div>
+  </div>
+
+  <footer class="aero-hangar-footer">
+    <div class="aero-container">
+      <nav class="aero-footer-nav">
+        <a href="sitemap.html">网站地图</a>
+        <a href="about.html">关于我们</a>
+        <a href="terms.html">服务条款</a>
+        <a href="privacy.html">隐私政策</a>
+      </nav>
+      <div class="aero-footer-copy">
+        &copy; 2026 Mitce机场 版权所有. 保持超音速稳定互联.
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

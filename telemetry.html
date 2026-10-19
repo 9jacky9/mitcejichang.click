@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>航线速报 - Mitce机场网络工程与极速加速专栏</title>
+  <meta name="description" content="Mitce机场官方航线速报与技术专栏。深度解析BGP与IPLC跨洋链路表现、客户端调优、次时代传输协议实测及超音速网络加速指南。">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --aero-bg: #F4F6F9;
+      --aero-surface: #FFFFFF;
+      --aero-slate: #0F172A;
+      --aero-slate-soft: #334155;
+      --aero-muted: #64748B;
+      --aero-orange: #EA580C;
+      --aero-orange-hover: #C2410C;
+      --aero-silver: #CBD5E1;
+      --aero-border: #E2E8F0;
+      --aero-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", sans-serif;
+    }
+    body { font-family: var(--aero-font); background: var(--aero-bg); color: var(--aero-slate); line-height: 1.65; -webkit-font-smoothing: antialiased; }
+    
+    /* Prominent Consistent Hyperlinks: No blue/purple, keeps accent before and after visited */
+    a, a:visited { color: var(--aero-orange); text-decoration: none; transition: color 0.15s ease; }
+    a:hover { color: var(--aero-orange-hover); text-decoration: underline; }
+
+    .aero-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    .aero-masthead { background: var(--aero-surface); border-bottom: 2px solid var(--aero-border); position: sticky; top: 0; z-index: 100; }
+    .aero-nav-row { display: flex; justify-content: space-between; align-items: center; height: 72px; }
+    .aero-nav-links { display: flex; gap: 24px; font-size: 15px; font-weight: 600; }
+    .aero-nav-links a, .aero-nav-links a:visited { color: var(--aero-slate-soft); }
+    .aero-nav-links a:hover { color: var(--aero-orange); text-decoration: none; }
+
+    .hero-banner { padding: 60px 0 45px; background: linear-gradient(175deg, #FFFFFF 0%, #F8FAFC 100%); border-bottom: 1px solid var(--aero-border); margin-bottom: 40px; position: relative; overflow: hidden; }
+    .aero-banner-bg-anim { position: absolute; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .aero-banner-streak { position: absolute; height: 2px; background: linear-gradient(90deg, transparent, rgba(234, 88, 12, 0.35), var(--aero-orange), transparent); border-radius: 999px; opacity: 0.65; animation: aeroWindDrift 4.5s linear infinite; }
+    @keyframes aeroWindDrift { 0% { transform: translateX(110vw); opacity: 0; } 15% { opacity: 0.75; } 85% { opacity: 0.75; } 100% { transform: translateX(-30vw); opacity: 0; } }
+    .badge { display: inline-block; background: #FFF7ED; color: var(--aero-orange); border: 1px solid #FFEDD5; padding: 4px 12px; font-size: 12px; font-weight: 800; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 1px; }
+    h1 { font-size: 36px; font-weight: 900; color: var(--aero-slate); font-style: italic; margin-bottom: 12px; }
+    .lead { font-size: 16px; color: var(--aero-muted); max-width: 720px; }
+
+    .articles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-bottom: 60px; }
+    .article-card { background: var(--aero-surface); border: 1px solid var(--aero-border); border-radius: 4px 16px 4px 4px; padding: 28px; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease; position: relative; }
+    .article-card:hover { transform: translateY(-4px); border-color: var(--aero-orange); box-shadow: 0 12px 24px rgba(234, 88, 12, 0.08); }
+    .card-tag { font-size: 12px; font-weight: 800; color: var(--aero-orange); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; display: block; }
+    .card-title { font-size: 18px; font-weight: 800; line-height: 1.4; margin-bottom: 14px; }
+    .card-title a, .card-title a:visited { color: var(--aero-slate); text-decoration: none; }
+    .card-title a:hover { color: var(--aero-orange); }
+    .card-excerpt { font-size: 14px; color: var(--aero-muted); line-height: 1.6; margin-bottom: 20px; }
+    .card-meta { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--aero-border); padding-top: 14px; font-size: 13px; font-weight: 600; }
+    .read-more { font-weight: 800; font-size: 14px; }
+
+    .aero-btn { display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; padding: 12px 22px; border-radius: 4px; transform: skew(-8deg); background: var(--aero-orange); color: #FFFFFF !important; text-decoration: none !important; }
+    .aero-btn span { transform: skew(8deg); }
+    .aero-btn:hover { background: var(--aero-orange-hover); }
+
+    .aero-hangar-footer { background: var(--aero-slate); color: #FFFFFF; padding: 50px 0 35px; border-top: 4px solid var(--aero-orange); margin-top: 60px; }
+    .aero-footer-nav { display: flex; justify-content: center; gap: 40px; margin-bottom: 24px; flex-wrap: wrap; }
+    .aero-footer-nav a, .aero-footer-nav a:visited { font-size: 15px; font-weight: 700; color: var(--aero-silver); }
+    .aero-footer-nav a:hover { color: #F97316; text-decoration: none; }
+    .aero-footer-copy { text-align: center; font-size: 13px; color: var(--aero-muted); }
+
+    .aero-nav-checkbox { display: none; }
+    .aero-menu-btn { display: none; cursor: pointer; }
+    .aero-icon-close { display: none; }
+    .aero-header-actions { display: flex; align-items: center; gap: 10px; }
+
+    @media (max-width: 992px) { .articles-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) {
+      .aero-brand-link svg { max-width: 140px; height: auto; }
+      .aero-nav-row { position: relative; }
+      .aero-menu-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 38px;
+        height: 38px;
+        background: var(--aero-surface);
+        border: 1px solid var(--aero-border);
+        border-radius: 4px;
+        color: var(--aero-slate);
+        transform: skew(-6deg);
+      }
+      .aero-menu-btn svg { transform: skew(6deg); }
+      .aero-nav-checkbox:checked ~ .aero-header-actions .aero-menu-btn .aero-icon-burger { display: none; }
+      .aero-nav-checkbox:checked ~ .aero-header-actions .aero-menu-btn .aero-icon-close { display: block; }
+      .aero-nav-links {
+        display: none !important;
+        position: absolute;
+        top: 100%;
+        left: -20px;
+        right: -20px;
+        background: #FFFFFF;
+        border-top: 2px solid var(--aero-orange);
+        border-bottom: 2px solid var(--aero-border);
+        flex-direction: column;
+        padding: 12px 20px;
+        gap: 6px;
+        box-shadow: 0 16px 30px rgba(15, 23, 42, 0.12);
+        z-index: 999;
+      }
+      .aero-nav-checkbox:checked ~ .aero-nav-links { display: flex !important; }
+      .aero-nav-links a {
+        padding: 12px 14px;
+        border-radius: 4px;
+        font-size: 15px;
+        font-weight: 700;
+        background: var(--aero-bg);
+        border: 1px solid var(--aero-border);
+        color: var(--aero-slate) !important;
+      }
+      .aero-header-actions .aero-btn { padding: 9px 14px; font-size: 13px; }
+    }
+    @media (max-width: 640px) { .articles-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+  <header class="aero-masthead">
+    <div class="aero-container">
+      <div class="aero-nav-row">
+        <a href="index.html" class="aero-brand-link" title="Mitce机场">
+          <svg width="200" height="38" viewBox="0 0 220 42" fill="none">
+            <g transform="skewX(-10)">
+              <path d="M4 22L24 6L18 22L24 36L4 22Z" fill="#EA580C"/>
+              <path d="M16 22L32 10L28 22L32 32L16 22Z" fill="#F97316"/>
+              <line x1="38" y1="22" x2="65" y2="22" stroke="#EA580C" stroke-width="3"/>
+              <text x="68" y="29" font-family="-apple-system, sans-serif" font-size="21" font-weight="900" fill="#0F172A">MITCE</text>
+              <text x="144" y="29" font-family="-apple-system, sans-serif" font-size="18" font-weight="900" fill="#EA580C">机场</text>
+            </g>
+          </svg>
+        </a>
+        <input type="checkbox" id="aero-tele-toggle" class="aero-nav-checkbox" aria-label="切换导航菜单">
+        <div class="aero-nav-links">
+          <a href="index.html#features">表现力</a>
+          <a href="index.html#streaming">载荷支持</a>
+          <a href="index.html#pricing">订购方案</a>
+          <a href="index.html#faq">常见问答</a>
+          <a href="telemetry.html">航线速报</a>
+        </div>
+        <div class="aero-header-actions">
+          <a href="https://ww012.twilightaff.com/#/?code=A56DH1Af" class="aero-btn" rel="nofollow" target="_blank">
+            <span>进入官网</span>
+          </a>
+          <label for="aero-tele-toggle" class="aero-menu-btn" aria-label="切换导航菜单">
+            <svg class="aero-icon-burger" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <line x1="3" y1="12" x2="21" y2="12"></line>
+              <line x1="3" y1="18" x2="21" y2="18"></line>
+            </svg>
+            <svg class="aero-icon-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </label>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="hero-banner">
+    <div class="aero-banner-bg-anim" aria-hidden="true">
+      <div class="aero-banner-streak" style="top: 25%; width: 280px; animation-duration: 3.6s; animation-delay: 0s;"></div>
+      <div class="aero-banner-streak" style="top: 60%; width: 440px; animation-duration: 4.8s; animation-delay: 1.2s;"></div>
+      <div class="aero-banner-streak" style="top: 85%; width: 360px; animation-duration: 4.0s; animation-delay: 0.5s;"></div>
+    </div>
+    <div class="aero-container" style="position: relative; z-index: 1;">
+      <span class="badge">AERO TELEMETRY & INSIGHTS</span>
+      <h1>航线速报 · 网络工程前沿与技术洞见</h1>
+      <p class="lead">汇集低延迟网络架构、BGP/IPLC专线实测、主流客户端内核调优指南与次时代网络通信协议深度剖析。</p>
+    </div>
+  </div>
+
+  <div class="aero-container">
+    <div class="articles-grid">
+      <!-- Article 1 (Product Intro) -->
+      <article class="article-card">
+        <div>
+          <span class="card-tag">平台实测 · 官方测评</span>
+          <h2 class="card-title">
+            <a href="mitce-acceleration-engine-review.html">超音速专线实测：2026年Mitce机场网络表现与低延迟体验深度评测</a>
+          </h2>
+          <p class="card-excerpt">全面测试Mitce机场在亚太骨干走廊与跨洋专线上的真实吞吐能级，探究其全协议栈加速引擎与零丢包调度算法的实际落地表现。</p>
+        </div>
+        <div class="card-meta">
+          <span style="color: var(--aero-muted);">2026-10-18</span>
+          <a href="mitce-acceleration-engine-review.html" class="read-more">阅读全篇 &rarr;</a>
+        </div>
+      </article>
+
+      <!-- Article 2 -->
+      <article class="article-card">
+        <div>
+          <span class="card-tag">底层基建 · 链路对比</span>
+          <h2 class="card-title">
+            <a href="bgp-iplc-latency-analysis.html">公网中继还是物理直连？BGP与IPLC跨洋链路真实丢包率对比</a>
+          </h2>
+          <p class="card-excerpt">通过多地节点百小时连续压力拨测数据，深度剖析公网隧道与端到端物理IPLC专线在高峰期时延抖动与丢包率上的本质鸿沟。</p>
+        </div>
+        <div class="card-meta">
+          <span style="color: var(--aero-muted);">2026-10-17</span>
+          <a href="bgp-iplc-latency-analysis.html" class="read-more">阅读全篇 &rarr;</a>
+        </div>
+      </article>
+
+      <!-- Article 3 -->
+      <article class="article-card">
+        <div>
+          <span class="card-tag">客户端调优 · 极客指南</span>
+          <h2 class="card-title">
+            <a href="clash-verge-mihomo-tuning.html">Clash Verge与Mihomo内核高阶调优：解决高峰期DNS泄漏与连接卡顿</a>
+          </h2>
+          <p class="card-excerpt">基于Mihomo新一代内核特性，手把手指导分流规则优化、Fake-IP模式调校与DNS防污染机制配置，全面释放硬件网络吞吐潜力。</p>
+        </div>
+        <div class="card-meta">
+          <span style="color: var(--aero-muted);">2026-10-16</span>
+          <a href="clash-verge-mihomo-tuning.html" class="read-more">阅读全篇 &rarr;</a>
+        </div>
+      </article>
+
+      <!-- Article 4 -->
+      <article class="article-card">
+        <div>
+          <span class="card-tag">协议演进 · 实验基准</span>
+          <h2 class="card-title">
+            <a href="quic-hysteria-protocol-benchmark.html">基于UDP的次时代传输协议实测：Hysteria2与TUIC在恶劣丢包环境下的吞吐表现</a>
+          </h2>
+          <p class="card-excerpt">对比传统TCP封装与QUIC/UDP协议在跨国恶劣拥塞信道下的抗丢包极限，揭示拥塞控制算法Brutal与BBR的实操差异。</p>
+        </div>
+        <div class="card-meta">
+          <span style="color: var(--aero-muted);">2026-10-15</span>
+          <a href="quic-hysteria-protocol-benchmark.html" class="read-more">阅读全篇 &rarr;</a>
+        </div>
+      </article>
+
+      <!-- Article 5 -->
+      <article class="article-card">
+        <div>
+          <span class="card-tag">影音工程 · 码率解析</span>
+          <h2 class="card-title">
+            <a href="stream-buffer-4k-codecs-guide.html">为什么你的4K视频总在缓冲？解码器负载与跨境网络时延抖动剖析</a>
+          </h2>
+          <p class="card-excerpt">高码率AV1与HEVC 4K视频不仅考验终端硬件解码性能，更对跨境TCP滑动窗口与连接持续抖动提出了严苛考验。本文详解排障全流程。</p>
+        </div>
+        <div class="card-meta">
+          <span style="color: var(--aero-muted);">2026-10-14</span>
+          <a href="stream-buffer-4k-codecs-guide.html" class="read-more">阅读全篇 &rarr;</a>
+        </div>
+      </article>
+
+      <!-- Article 6 -->
+      <article class="article-card">
+        <div>
+          <span class="card-tag">家庭网络 · 路由分流</span>
+          <h2 class="card-title">
+            <a href="home-router-openwrt-gateway.html">家庭软路由OpenWrt全屋分流方案：透明代理与策略路由避坑实录</a>
+          </h2>
+          <p class="card-excerpt">如何打造电视盒子、游戏主机与个人PC全屋无感智能分流？本文详解OpenWrt旁路由与PassWall/OpenClash的最佳实践。</p>
+        </div>
+        <div class="card-meta">
+          <span style="color: var(--aero-muted);">2026-10-12</span>
+          <a href="home-router-openwrt-gateway.html" class="read-more">阅读全篇 &rarr;</a>
+        </div>
+      </article>
+    </div>
+  </div>
+
+  <footer class="aero-hangar-footer">
+    <div class="aero-container">
+      <nav class="aero-footer-nav">
+        <a href="sitemap.html">网站地图</a>
+        <a href="about.html">关于我们</a>
+        <a href="terms.html">服务条款</a>
+        <a href="privacy.html">隐私政策</a>
+      </nav>
+      <div class="aero-footer-copy">
+        &copy; 2026 Mitce机场 版权所有. 保持超音速稳定互联.
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
