@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>航线速报 - Mitce机场网络工程与极速加速专栏</title>
-  <meta name="description" content="Mitce机场官方航线速报与技术专栏。深度解析BGP与IPLC跨洋链路表现、客户端调优、次时代传输协议实测及超音速网络加速指南。">
+  <title>航线速报：家庭网络、客户端与排障指南 - Mitce机场</title>
+  <meta name="description" content="Mitce 航线速报：光猫桥接、客户端配置同步、路由器管理页安全、对照测试法、网站打不开的判断与赛事直播常识。">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -167,8 +167,8 @@
     </div>
     <div class="aero-container" style="position: relative; z-index: 1;">
       <span class="badge">AERO TELEMETRY & INSIGHTS</span>
-      <h1>航线速报 · 网络工程前沿与技术洞见</h1>
-      <p class="lead">汇集低延迟网络架构、BGP/IPLC专线实测、主流客户端内核调优指南与次时代网络通信协议深度剖析。</p>
+      <h1>航线速报 · 家庭网络与使用指南</h1>
+      <p class="lead">光猫、路由器、客户端与排障，用清晰的步骤把问题讲明白。</p>
     </div>
   </div>
 
@@ -177,14 +177,14 @@
       <!-- Article 1 (Product Intro) -->
       <article class="article-card">
         <div>
-          <span class="card-tag">平台实测 · 官方测评</span>
+          <span class="card-tag">对照测试</span>
           <h2 class="card-title">
-            <a href="mitce-acceleration-engine-review.html">超音速专线实测：2026年Mitce机场网络表现与低延迟体验深度评测</a>
+            <a href="mitce-acceleration-engine-review.html">Mitce 对照测试：和直连比一比，到底快在哪</a>
           </h2>
-          <p class="card-excerpt">全面测试Mitce机场在亚太骨干走廊与跨洋专线上的真实吞吐能级，探究其全协议栈加速引擎与零丢包调度算法的实际落地表现。</p>
+          <p class="card-excerpt">同一网站分别在直连与加速下测一遍，差异就是服务带来的真实价值。</p>
         </div>
         <div class="card-meta">
-          <span style="color: var(--aero-muted);">2026-10-18</span>
+          <span style="color: var(--aero-muted);">2026-11-12</span>
           <a href="mitce-acceleration-engine-review.html" class="read-more">阅读全篇 &rarr;</a>
         </div>
       </article>
@@ -192,14 +192,14 @@
       <!-- Article 2 -->
       <article class="article-card">
         <div>
-          <span class="card-tag">底层基建 · 链路对比</span>
+          <span class="card-tag">家庭网络</span>
           <h2 class="card-title">
-            <a href="bgp-iplc-latency-analysis.html">公网中继还是物理直连？BGP与IPLC跨洋链路真实丢包率对比</a>
+            <a href="bgp-iplc-latency-analysis.html">光猫桥接与拨号入门：PPPoE、DHCP 一次讲清</a>
           </h2>
-          <p class="card-excerpt">通过多地节点百小时连续压力拨测数据，深度剖析公网隧道与端到端物理IPLC专线在高峰期时延抖动与丢包率上的本质鸿沟。</p>
+          <p class="card-excerpt">桥接让路由器自己拨号，通常更稳定，但改之前要先记下宽带账号并保留回退办法。</p>
         </div>
         <div class="card-meta">
-          <span style="color: var(--aero-muted);">2026-10-17</span>
+          <span style="color: var(--aero-muted);">2026-11-15</span>
           <a href="bgp-iplc-latency-analysis.html" class="read-more">阅读全篇 &rarr;</a>
         </div>
       </article>
@@ -207,14 +207,14 @@
       <!-- Article 3 -->
       <article class="article-card">
         <div>
-          <span class="card-tag">客户端调优 · 极客指南</span>
+          <span class="card-tag">客户端</span>
           <h2 class="card-title">
-            <a href="clash-verge-mihomo-tuning.html">Clash Verge与Mihomo内核高阶调优：解决高峰期DNS泄漏与连接卡顿</a>
+            <a href="clash-verge-mihomo-tuning.html">跨平台客户端的配置同步：备份、导出与迁移</a>
           </h2>
-          <p class="card-excerpt">基于Mihomo新一代内核特性，手把手指导分流规则优化、Fake-IP模式调校与DNS防污染机制配置，全面释放硬件网络吞吐潜力。</p>
+          <p class="card-excerpt">把配置与规则当作文档管理：定期导出、命名清楚、换设备时按清单迁移。</p>
         </div>
         <div class="card-meta">
-          <span style="color: var(--aero-muted);">2026-10-16</span>
+          <span style="color: var(--aero-muted);">2026-11-14</span>
           <a href="clash-verge-mihomo-tuning.html" class="read-more">阅读全篇 &rarr;</a>
         </div>
       </article>
@@ -222,14 +222,14 @@
       <!-- Article 4 -->
       <article class="article-card">
         <div>
-          <span class="card-tag">协议演进 · 实验基准</span>
+          <span class="card-tag">排障思路</span>
           <h2 class="card-title">
-            <a href="quic-hysteria-protocol-benchmark.html">基于UDP的次时代传输协议实测：Hysteria2与TUIC在恶劣丢包环境下的吞吐表现</a>
+            <a href="quic-hysteria-protocol-benchmark.html">网站打不开：怎样判断是网站挂了还是自己的问题</a>
           </h2>
-          <p class="card-excerpt">对比传统TCP封装与QUIC/UDP协议在跨国恶劣拥塞信道下的抗丢包极限，揭示拥塞控制算法Brutal与BBR的实操差异。</p>
+          <p class="card-excerpt">三步判断：问问别人能不能开、换个网络试试、换个设备试试，问题归属一目了然。</p>
         </div>
         <div class="card-meta">
-          <span style="color: var(--aero-muted);">2026-10-15</span>
+          <span style="color: var(--aero-muted);">2026-11-11</span>
           <a href="quic-hysteria-protocol-benchmark.html" class="read-more">阅读全篇 &rarr;</a>
         </div>
       </article>
@@ -237,14 +237,14 @@
       <!-- Article 5 -->
       <article class="article-card">
         <div>
-          <span class="card-tag">影音工程 · 码率解析</span>
+          <span class="card-tag">观赛指南</span>
           <h2 class="card-title">
-            <a href="stream-buffer-4k-codecs-guide.html">为什么你的4K视频总在缓冲？解码器负载与跨境网络时延抖动剖析</a>
+            <a href="stream-buffer-4k-codecs-guide.html">体育赛事直播看不了：地区限制与转播平台的常识</a>
           </h2>
-          <p class="card-excerpt">高码率AV1与HEVC 4K视频不仅考验终端硬件解码性能，更对跨境TCP滑动窗口与连接持续抖动提出了严苛考验。本文详解排障全流程。</p>
+          <p class="card-excerpt">赛事转播按地区授权，最稳妥的是通过所在地区的官方渠道观看，并保证网络稳定。</p>
         </div>
         <div class="card-meta">
-          <span style="color: var(--aero-muted);">2026-10-14</span>
+          <span style="color: var(--aero-muted);">2026-11-10</span>
           <a href="stream-buffer-4k-codecs-guide.html" class="read-more">阅读全篇 &rarr;</a>
         </div>
       </article>
@@ -252,14 +252,14 @@
       <!-- Article 6 -->
       <article class="article-card">
         <div>
-          <span class="card-tag">家庭网络 · 路由分流</span>
+          <span class="card-tag">设备安全</span>
           <h2 class="card-title">
-            <a href="home-router-openwrt-gateway.html">家庭软路由OpenWrt全屋分流方案：透明代理与策略路由避坑实录</a>
+            <a href="home-router-openwrt-gateway.html">家用路由器管理页安全：改密码、关远程、升固件</a>
           </h2>
-          <p class="card-excerpt">如何打造电视盒子、游戏主机与个人PC全屋无感智能分流？本文详解OpenWrt旁路由与PassWall/OpenClash的最佳实践。</p>
+          <p class="card-excerpt">改默认密码、关远程管理、定期升级、检查设备列表，四步就能堵住大部分风险。</p>
         </div>
         <div class="card-meta">
-          <span style="color: var(--aero-muted);">2026-10-12</span>
+          <span style="color: var(--aero-muted);">2026-11-13</span>
           <a href="home-router-openwrt-gateway.html" class="read-more">阅读全篇 &rarr;</a>
         </div>
       </article>

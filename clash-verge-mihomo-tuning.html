@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Clash Verge与Mihomo内核高阶调优：解决高峰期DNS泄漏与连接卡顿 - 航线速报</title>
-  <meta name="description" content="针对Clash Verge Rev客户端与Mihomo内核的高级调校指南，详解Tun模式、Fake-IP机制、DNS分流策略与规则分层优化，全面消除跨洋网络卡顿。">
+  <title>跨平台客户端的配置同步：备份、导出与迁移 - 航线速报</title>
+  <meta name="description" content="电脑、手机、平板都用同一个服务，配置怎么保持一致？介绍配置备份、导出与导入、跨设备迁移与版本管理的做法。">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -112,41 +112,25 @@
   <div class="aero-container">
     <div class="article-wrap">
       <div class="crumb">
-        <a href="index.html">首页</a> &gt; <a href="telemetry.html">航线速报</a> &gt; 正文
-      </div>
+        <a href="index.html">首页</a> &gt; <a href="telemetry.html">航线速报</a> &gt; 客户端</div>
 
-      <h1>Clash Verge与Mihomo内核高阶调优：解决高峰期DNS泄漏与连接卡顿</h1>
+      <h1>跨平台客户端的配置同步：备份、导出与迁移</h1>
       
       <div class="meta-bar">
-        <span>作者：系统调优工程师</span>
-        <span>发布日期：2026-10-16</span>
-        <span>分类：客户端调优</span>
-        <span>阅读时长：约 6 分钟</span>
-      </div>
-
-      <p>随着原版 Clash 核心停止维护，以 Mihomo（Clash.Meta）为底座的新一代开源客户端（如 Clash Verge Rev、Flclash 等）迅速成为了极客人群的主流工具。然而很多使用者在默认配置下，经常遭遇网页首次加载转圈、部分应用无法代理、或在第三方测试站被检测出明显的 DNS 污染与泄漏问题。按照专业极客网络论坛与<a href="https://tizilab.net/" target="_blank">梯子实验室权威指引</a>推荐的调优准则，合理配置内核模块能够大幅降低握手开销，消灭 90% 以上的不明断流。</p>
-
-      <h2>一、深入理解 Fake-IP 模式与 Redir-Host 差异</h2>
-      <p>在 DNS 配置中，最关键的核心选项是解析模式的选择。传统 Redir-Host 需要本地客户端先发起真实 DNS 解析拿到目标服务器 IP，再由规则判断是否走代理，这在跨境高延迟场景下会造成极大的首包等待时间。</p>
-
-      <h3>1. 为什么强烈建议启用 Fake-IP？</h3>
-      <p>Fake-IP 模式下，客户端在收到应用程序的域名解析请求时，会立即从保留地址池（如 <code>198.18.0.1/16</code>）派发一个虚拟虚假 IP，应用程序即刻发起连接请求。真正的目标域名是在数据包进入代理远端服务器后才进行远程无污染解析，从而省去了一次完整的本地 DNS 往返延迟。</p>
-
-      <h3>2. 规避 Fake-IP 过滤黑名单的技巧</h3>
-      <p>需要注意的是，某些内网打印机、本地局域网服务或特定国内游戏平台对 Fake-IP 不兼容。应在 <code>fake-ip-filter</code> 中加入 <code>*.lan</code>、<code>*.local</code> 以及局域网常见网段，确保局域网设备互访不受干扰。</p>
-
-      <h2>二、Tun 模式的深层配置与防泄漏策略</h2>
-      <p>普通的系统代理仅对支持 HTTP/SOCKS 协议的浏览器应用生效，很多命令行终端或桌面客户端会直接绕开代理产生直连泄漏。启用 Mihomo 的 Tun 虚拟网卡模式是实现全局流量接管的最佳方案。</p>
-
-      <h3>1. 开启 Strict-Route 严格路由</h3>
-      <p>在配置文件中勾选或写入 <code>strict-route: true</code>，Tun 驱动会在底层改写系统默认路由表，阻止未经 Tun 虚拟网卡的任何原始流量逃逸，从系统物理层断绝 DNS 与 TCP 直连泄漏。</p>
-
-      <h3>2. 分流规则的分层轻量化优化</h3>
-      <p>很多用户热衷于加载多达数万条的庞大规则集，这会显著增加数据包逐包匹配时的 CPU 开销，导致高并发下载时产生微小卡顿。建议采用精简分类规则（GeoSite / GeoIP 配合 Rule-Set），优先匹配大类白名单（如 Direct 直连国内主流 CDN），将未知流量降级至代理规则，提升吞吐效率。</p>
-
-      <h2>三、总结</h2>
-      <p>通过启用 Fake-IP 模式、结合 Tun 严格路由以及轻量化的规则分层，您的 Mihomo 客户端将处于极佳的响应状态。这不仅保障了跨洋数据流的私密性，更让每一次点击都拥有瞬间响应的丝滑体验。</p>
-    </div>
+ <span>作者：Mitce 使用手记</span> <span>发布日期：2026-11-14</span> <span>分类：客户端</span> <span>阅读时长：约 5 分钟</span>
+ </div>
+<p>设备一多，配置就容易出现“这台能用、那台不行”的情况。把它当成一份需要管理的文档，就清晰多了。</p>
+<h2>一、需要备份什么</h2>
+<ul><li>服务商提供的配置与你自己修改后的版本。</li><li>自定义的规则与分组设置。</li><li>客户端的主要选项，如模式、端口与开机自启。</li></ul>
+<h2>二、怎么备份</h2>
+<p>多数客户端支持导出配置文件。每次做较大的修改前先导出一份，文件名带上日期，保存在云盘或本地的固定文件夹。</p>
+<h2>三、跨设备迁移</h2>
+<p>在新设备上安装客户端，导入配置，再逐项核对规则与分组。不同平台的客户端选项不完全相同，迁移后要重新测试几个常用场景。</p>
+<h2>四、保持一致的小技巧</h2>
+<p>把规则单独维护成一份，各设备都引用同一份，修改一次，处处生效；个人的差异化设置另行记录。</p>
+<h2>五、版本管理</h2>
+<p>保留最近三个版本的配置。新配置出现问题，可以立即回退到上一版，而不是从零排查。</p>
+ </div>
   </div>
 
   <footer class="aero-hangar-footer">
