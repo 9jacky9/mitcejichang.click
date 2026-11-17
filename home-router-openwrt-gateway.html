@@ -1,11 +1,12 @@
 <!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>家用路由器管理页安全：改密码、关远程、升固件 - 航线速报</title>
-  <meta name="description" content="路由器是家庭网络的大门。介绍修改默认管理密码、关闭不必要的远程管理、更新固件、检查连接设备与无线加密的安全清单。">
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>OpenWrt家庭网关怎么排查：先分清路由、桥接和DHCP角色</title>
+<meta content="用家庭网络拓扑和单设备对照检查OpenWrt网关问题，区分地址分配、默认网关、名称解析与转发，避免全网盲改。" name="description"/>
+<style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --aero-bg: #F4F6F9;
@@ -78,73 +79,70 @@
   </style>
 </head>
 <body>
-
-  <header class="aero-masthead">
-    <div class="aero-header-anim" aria-hidden="true">
-      <div class="aero-header-streak" style="top: 25%; width: 240px; animation-duration: 3.5s;"></div>
-      <div class="aero-header-streak" style="top: 75%; width: 360px; animation-duration: 4.8s; animation-delay: 1.2s;"></div>
-    </div>
-    <div class="aero-container" style="position: relative; z-index: 1;">
-      <div class="aero-nav-row">
-        <a href="index.html" class="aero-brand-link" title="Mitce机场">
-          <svg width="200" height="38" viewBox="0 0 220 42" fill="none">
-            <g transform="skewX(-10)">
-              <path d="M4 22L24 6L18 22L24 36L4 22Z" fill="#EA580C"/>
-              <path d="M16 22L32 10L28 22L32 32L16 22Z" fill="#F97316"/>
-              <line x1="38" y1="22" x2="65" y2="22" stroke="#EA580C" stroke-width="3"/>
-              <text x="68" y="29" font-family="-apple-system, sans-serif" font-size="21" font-weight="900" fill="#0F172A">MITCE</text>
-              <text x="144" y="29" font-family="-apple-system, sans-serif" font-size="18" font-weight="900" fill="#EA580C">机场</text>
-            </g>
-          </svg>
-        </a>
-        <div class="aero-nav-links">
-          <a href="index.html#features">表现力</a>
-          <a href="index.html#streaming">载荷支持</a>
-          <a href="index.html#pricing">订购方案</a>
-          <a href="index.html#faq">常见问答</a>
-          <a href="telemetry.html">航线速报</a>
-        </div>
+<header class="aero-masthead">
+<div aria-hidden="true" class="aero-header-anim">
+<div class="aero-header-streak" style="top: 25%; width: 240px; animation-duration: 3.5s;"></div>
+<div class="aero-header-streak" style="top: 75%; width: 360px; animation-duration: 4.8s; animation-delay: 1.2s;"></div>
+</div>
+<div class="aero-container" style="position: relative; z-index: 1;">
+<div class="aero-nav-row">
+<a class="aero-brand-link" href="index.html" title="Mitce机场">
+<svg fill="none" height="38" viewbox="0 0 220 42" width="200">
+<g transform="skewX(-10)">
+<path d="M4 22L24 6L18 22L24 36L4 22Z" fill="#EA580C"></path>
+<path d="M16 22L32 10L28 22L32 32L16 22Z" fill="#F97316"></path>
+<line stroke="#EA580C" stroke-width="3" x1="38" x2="65" y1="22" y2="22"></line>
+<text fill="#0F172A" font-family="-apple-system, sans-serif" font-size="21" font-weight="900" x="68" y="29">MITCE</text>
+<text fill="#EA580C" font-family="-apple-system, sans-serif" font-size="18" font-weight="900" x="144" y="29">机场</text>
+</g>
+</svg>
+</a>
+<div class="aero-nav-links">
+<a href="index.html#features">表现力</a>
+<a href="index.html#streaming">载荷支持</a>
+<a href="index.html#pricing">订购方案</a>
+<a href="index.html#faq">常见问答</a>
+<a href="telemetry.html">航线速报</a>
+</div>
+</div>
+</div>
+</header>
+<div class="aero-container">
+<div class="article-wrap"><h1>OpenWrt家庭网关怎么排查：先分清路由、桥接和DHCP角色</h1><div data-swc-article-body="2026-11-16"><p>给家里增加一台OpenWrt设备后，有的手机能上网，有的电脑却打不开网页，常见原因不是某个插件太旧，而是网络角色没有理清。设备负责路由、无线接入还是旁路处理，会影响地址分配与流量走向。先把拓扑写清，再调整一台测试设备，比同时修改全家网络更安全也更容易判断。</p>
+<h2>画出当前真实连接关系</h2>
+<p>标出光猫、原路由、OpenWrt设备、交换机和终端，并注明连接的网口。写下谁负责拨号、谁分配地址、谁是终端的默认网关。不要只按设备外观判断角色：一台带无线功能的设备可能仅作为接入点，也可能承担完整路由和地址转换。</p>
+<p>同时记下电视、电话、智能家居等依赖现有网络的设备。它们可能使用特定接入或配置，不能为了让一台电脑正常就随意改变光猫模式。运营商管理项先向服务方确认，自有设备也应保留配置备份和管理入口。</p>
+<h2>先读取终端获得的地址</h2>
+<p>在出问题的终端查看地址、子网、默认网关和解析服务器，和一台正常设备比较。不同信息本身不一定错误，但必须符合预期设计。若同一局域网里两个设备都在主动分配地址，而规则不协调，终端可能获得不同网关，表现为时好时坏。</p>
+<p>开始<a href="https://dajichang.mom/">OpenWrt家庭网关排查</a>前，先记录这些现状，不立即改静态地址。地址冲突、错误网段和过期租约可能需要不同处理。不要为省事把所有终端设成同一个固定地址，也不要随意复制别人的网络数字。</p>
+<h2>网关可达与互联网可达分开检查</h2>
+<p>先确认终端能访问预期网关的管理入口，再测试一个正常公共网站。管理页可达说明局部连接具备一定条件，却不能证明上游转发正常。若管理页也打不开，要先查物理连接、无线关联和地址信息，不急着调整远端节点。</p>
+<p>接着观察问题是否只是名称解析。如果地址分配和网关都正确，但域名解析失败，应调查实际采用的解析服务。不要用长期访问数字地址的办法代替正常域名解析；加密网站的身份校验与站点路由可能依赖正确名称。</p>
+<h2>只让一台测试终端走新路径</h2>
+<p>在网络设计允许的条件下，先使用一台自有测试设备验证OpenWrt路径，其他家庭设备保持原样。按自己的网段规划设置，并记录恢复方式。如果测试设备正常、全网切换后才出现问题，再检查负载、地址分配和特定设备兼容性，不把结论直接归给宽带。</p>
+<p>不要在正在远程管理唯一网关时修改可能切断连接的项目。需要调整网络接口，应安排本地访问和恢复手段，并避开家人正在开会或上传资料的时间。一次改动只验证一个假设，失败立即恢复已知正常状态。</p>
+<h2>双重地址转换影响哪些任务</h2>
+<p>两层路由都进行地址转换时，普通浏览可能仍然正常，但某些点对点应用或主动对外提供的服务可能遇到额外限制。这不意味着双层结构对所有用途都不可用，也不意味着把设备设成桥接就一定正确。应先明确真实需求，再选择适合的结构。</p>
+<p>若只是日常网页正常、特定游戏无法加入房间，按照游戏官方说明调查，不先开放全部端口。家庭服务器需要外部访问时，还应确认运营商提供的地址条件。上游共享地址等因素可能使本地端口设置无法达到预期，应联系网络提供方核实。</p>
+<h2>插件与策略分流放到基础网络之后</h2>
+<p>基础路由稳定后，再逐项加入自己需要且得到授权的功能。观察实际连接是否命中预期策略，以及本地设备发现、打印和存储访问是否仍正常。不同OpenWrt版本与插件维护状态不同，不能将旧教程的一整段配置直接套到当前环境。</p>
+<p>若问题在启用某项功能后出现，先停用该项作对照，保留日志中的相关错误。不要通过关闭防火墙、取消身份验证或暴露管理界面来图省事。管理入口应保持受控，仅允许必要设备和网络访问。</p>
+<h2>从家庭任务完成度做最终验收</h2>
+<p>至少测试电脑浏览、手机联网、电视播放、打印或本地存储，以及正常重启后的恢复。确认终端拿到的地址和网关仍符合设计。某项功能不使用时可以标为未验证，但不能因为电脑能打开首页，就宣布全屋网络全部正常。</p>
+<p>把最终拓扑、设备角色、配置备份和恢复方法放在容易找到的受控位置。之后出现故障，先对照哪一层发生变化，不从头重装全部设备。家庭网关的可靠性来自清晰的职责和可恢复的配置，而不是启用了多少复杂功能。</p><p>使用LuCI时，先在状态概览查看设备状态与租约，再到网络接口页读取接口地址和运行状态，不急着点保存应用。将终端的默认网关与预期接口对照；若不同，先调查地址分配来源，而不是修改所有接口。</p></div></div>
+</div>
+<footer class="aero-hangar-footer">
+<div class="aero-container">
+<nav class="aero-footer-nav">
+<a href="sitemap.html">网站地图</a>
+<a href="about.html">关于我们</a>
+<a href="terms.html">服务条款</a>
+<a href="privacy.html">隐私政策</a>
+</nav>
+<div class="aero-footer-copy">
+        © 2026 Mitce机场 版权所有. 保持超音速稳定互联.
       </div>
-    </div>
-  </header>
-
-  <div class="aero-container">
-    <div class="article-wrap">
-      <div class="crumb">
-        <a href="index.html">首页</a> &gt; <a href="telemetry.html">航线速报</a> &gt; 设备安全</div>
-
-      <h1>家用路由器管理页安全：改密码、关远程、升固件</h1>
-      
-      <div class="meta-bar">
- <span>作者：Mitce 使用手记</span> <span>发布日期：2026-11-13</span> <span>分类：设备安全</span> <span>阅读时长：约 5 分钟</span>
- </div>
-<p>路由器经常被忽视，但它决定了整个家庭网络的安全。下面四步，十分钟就能做完。</p>
-<h2>一、修改默认管理密码</h2>
-<p>很多路由器出厂时使用简单的默认账号密码。登录管理页后立即修改为独特的强密码，并与无线密码区分开。</p>
-<h2>二、关闭不必要的远程管理</h2>
-<p>如果不需要在外面管理路由器，就关闭互联网端的管理入口，也不要为管理页做端口转发。</p>
-<h2>三、更新固件</h2>
-<p>厂商发布更新通常包含安全修复。检查当前版本，下载匹配型号的官方固件，升级前备份配置。</p>
-<h2>四、检查连接设备与无线加密</h2>
-<ul><li>查看连接设备列表，移除不认识的设备。</li><li>无线加密使用 WPA2 或更新的 WPA3。</li><li>关闭 WPS 一键连接功能。</li></ul>
-<h2>五、访客网络</h2>
-<p>给客人与智能设备使用访客网络，与主要设备隔离。</p>
- </div>
-  </div>
-
-  <footer class="aero-hangar-footer">
-    <div class="aero-container">
-      <nav class="aero-footer-nav">
-        <a href="sitemap.html">网站地图</a>
-        <a href="about.html">关于我们</a>
-        <a href="terms.html">服务条款</a>
-        <a href="privacy.html">隐私政策</a>
-      </nav>
-      <div class="aero-footer-copy">
-        &copy; 2026 Mitce机场 版权所有. 保持超音速稳定互联.
-      </div>
-    </div>
-  </footer>
-
+</div>
+</footer>
 </body>
 </html>

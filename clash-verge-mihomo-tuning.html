@@ -1,11 +1,12 @@
 <!DOCTYPE html>
+
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>跨平台客户端的配置同步：备份、导出与迁移 - 航线速报</title>
-  <meta name="description" content="电脑、手机、平板都用同一个服务，配置怎么保持一致？介绍配置备份、导出与导入、跨设备迁移与版本管理的做法。">
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>换电脑怎样迁移Clash与Mihomo配置：备份、重建和验证的安全顺序</title>
+<meta content="区分订阅来源、个人覆写和机器专属设置，逐步迁移Clash及Mihomo相关配置，避免覆盖有效规则或泄露凭据。" name="description"/>
+<style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --aero-bg: #F4F6F9;
@@ -79,73 +80,70 @@
   </style>
 </head>
 <body>
-
-  <header class="aero-masthead">
-    <div class="aero-header-anim" aria-hidden="true">
-      <div class="aero-header-streak" style="top: 25%; width: 240px; animation-duration: 3.5s;"></div>
-      <div class="aero-header-streak" style="top: 75%; width: 360px; animation-duration: 4.8s; animation-delay: 1.2s;"></div>
-    </div>
-    <div class="aero-container" style="position: relative; z-index: 1;">
-      <div class="aero-nav-row">
-        <a href="index.html" class="aero-brand-link" title="Mitce机场">
-          <svg width="200" height="38" viewBox="0 0 220 42" fill="none">
-            <g transform="skewX(-10)">
-              <path d="M4 22L24 6L18 22L24 36L4 22Z" fill="#EA580C"/>
-              <path d="M16 22L32 10L28 22L32 32L16 22Z" fill="#F97316"/>
-              <line x1="38" y1="22" x2="65" y2="22" stroke="#EA580C" stroke-width="3"/>
-              <text x="68" y="29" font-family="-apple-system, sans-serif" font-size="21" font-weight="900" fill="#0F172A">MITCE</text>
-              <text x="144" y="29" font-family="-apple-system, sans-serif" font-size="18" font-weight="900" fill="#EA580C">机场</text>
-            </g>
-          </svg>
-        </a>
-        <div class="aero-nav-links">
-          <a href="index.html#features">表现力</a>
-          <a href="index.html#streaming">载荷支持</a>
-          <a href="index.html#pricing">订购方案</a>
-          <a href="index.html#faq">常见问答</a>
-          <a href="telemetry.html">航线速报</a>
-        </div>
+<header class="aero-masthead">
+<div aria-hidden="true" class="aero-header-anim">
+<div class="aero-header-streak" style="top: 25%; width: 240px; animation-duration: 3.5s;"></div>
+<div class="aero-header-streak" style="top: 75%; width: 360px; animation-duration: 4.8s; animation-delay: 1.2s;"></div>
+</div>
+<div class="aero-container" style="position: relative; z-index: 1;">
+<div class="aero-nav-row">
+<a class="aero-brand-link" href="index.html" title="Mitce机场">
+<svg fill="none" height="38" viewbox="0 0 220 42" width="200">
+<g transform="skewX(-10)">
+<path d="M4 22L24 6L18 22L24 36L4 22Z" fill="#EA580C"></path>
+<path d="M16 22L32 10L28 22L32 32L16 22Z" fill="#F97316"></path>
+<line stroke="#EA580C" stroke-width="3" x1="38" x2="65" y1="22" y2="22"></line>
+<text fill="#0F172A" font-family="-apple-system, sans-serif" font-size="21" font-weight="900" x="68" y="29">MITCE</text>
+<text fill="#EA580C" font-family="-apple-system, sans-serif" font-size="18" font-weight="900" x="144" y="29">机场</text>
+</g>
+</svg>
+</a>
+<div class="aero-nav-links">
+<a href="index.html#features">表现力</a>
+<a href="index.html#streaming">载荷支持</a>
+<a href="index.html#pricing">订购方案</a>
+<a href="index.html#faq">常见问答</a>
+<a href="telemetry.html">航线速报</a>
+</div>
+</div>
+</div>
+</header>
+<div class="aero-container">
+<div class="article-wrap"><h1>换电脑怎样迁移Clash与Mihomo配置：备份、重建和验证的安全顺序</h1><div data-swc-article-body="2026-11-16"><p>旧电脑上的网络工具已经调好，换电脑后直接复制整个文件夹，却可能出现路径不存在、端口冲突或规则丢失。配置中既有可复用的个人选择，也有只适用于旧设备的系统状态。迁移的目标不是让两台机器文件完全相同，而是让新设备在安全、可理解的条件下完成同样任务。</p>
+<h2>先把配置分成三类</h2>
+<p>第一类是订阅来源和账号信息，可能包含访问凭据；第二类是自己编写的规则、策略选择和覆写；第三类是机器相关项目，例如安装位置、监听端口、虚拟网卡和服务状态。前两类需要妥善备份，第三类通常应在新设备上按当前环境重新确认。</p>
+<p>记录旧设备的软件与内核版本，并查看官方提供的导出或备份方法。不要只复制一个看起来像配置的文件，就假定所有个人设置都在里面。也不要将整个备份提交到公开代码仓库，订阅地址和令牌泄露后可能被他人使用。</p>
+<h2>先保存旧环境，再安装受支持版本</h2>
+<p>旧电脑继续保持可用，不急着卸载。把备份存入自己控制的加密或受限位置，并验证文件能够读取。新电脑从可信来源安装适用版本，确认系统支持情况，先不加入复杂自定义内容。若版本跨越较大，先阅读迁移和变更说明，避免旧字段被忽略。</p>
+<p>一份<a href="https://dajichang.mom/">Clash配置迁移与备份</a>清单应包括配置来源、个人修改、依赖文件、敏感信息位置和恢复步骤。这样遇到问题时可以知道缺了什么，而不必把旧电脑所有目录都复制过去碰运气。</p>
+<h2>先验证基础订阅，再恢复个人规则</h2>
+<p>使用受支持方式导入订阅，确认当前配置能够被选中和正常解析。先用一个公开测试目标验证基础访问，记录实际命中策略。若基础配置就失败，先解决获取、认证或兼容问题，不要同时加入旧环境中的几十条自定义规则。</p>
+<p>随后按用途分组恢复自己的覆写，例如某一应用的路径选择或家庭资源直连。每加一组就验证相关任务和原本正常的任务。优先使用软件支持的覆写机制，而不是直接修改会被订阅更新覆盖的文件；否则下次更新可能悄悄丢失迁移成果。</p>
+<h2>机器专属设置重新确认</h2>
+<p>新电脑可能已有程序占用旧端口，安装路径和文件权限也可能不同。检查软件实际使用的监听信息，不默认所有客户端采用同一端口。涉及服务模式或虚拟网卡时，按照当前系统与版本文档安装和授权，不从旧设备复制底层服务状态。</p>
+<p>若应用内还配置了代理，检查它指向新电脑正确的位置。终端环境变量、浏览器设置和开发工具可能各自保存地址，单独迁移客户端并不会自动更新这些内容。用连接记录确认每个关键应用是否采用预期路径，不仅看浏览器是否能打开网页。</p>
+<h2>规则正确之外，还要检查局域网</h2>
+<p>新电脑可能进入不同网段，原先针对家中打印机或存储的规则未必适用。核对本地资源地址与访问需求，不要把旧网段规则无限扩展成大范围绕过。访问公司或学校内部资源时，遵循管理员提供的方式，不能用个人迁移设置替代组织策略。</p>
+<p>如果新设备启用了不同的解析方式或网络接管模式，应单独验证内部名称和远端网站。只要某项旧设置用途不清，就先保留备份而不立即启用。能解释每个例外规则的原因，比保留一个无人理解的大配置更容易维护。</p>
+<h2>更新与重启是迁移验收的一部分</h2>
+<p>完成基本测试后，进行一次正常订阅更新，确认个人覆写仍然存在，再重启设备检查内核和配置是否正确恢复。还应测试休眠唤醒与常用网络切换，观察是否遗留系统代理或错误路由。软件窗口出现，不代表后台组件和应用接管全部就绪。</p>
+<p>记录测试使用的目标和结果。若更新后失效，比较有效配置和更新内容，别马上重建整个环境。需要恢复旧备份时，也应核对版本兼容性，而不是将旧文件强行覆盖到新版本运行目录中。</p>
+<h2>最后处理旧设备和临时副本</h2>
+<p>新环境稳定后，按自己的设备交接计划处理旧电脑中的凭据和授权。出售或交给他人使用前，应遵循完整的数据清理流程，而不是只删除桌面快捷方式。迁移过程中产生的中间备份也应有明确保留位置，避免长期散落在下载目录或共享盘。</p>
+<p>保留一份不含明文凭据的配置说明，写清来源、个人规则用途和常见恢复方法。下一次换设备时，只需重新验证变化部分。一次成功迁移的标准，是新电脑可靠工作、旧资料仍可追溯、敏感配置没有意外扩散。</p><p>可按三次检查留档：第一次仅导入订阅；第二次恢复个人规则；第三次重启后复测。每次写下选中的配置名、策略组和实际命中结果，哪一步开始失败，就从该步新增内容调查。</p></div></div>
+</div>
+<footer class="aero-hangar-footer">
+<div class="aero-container">
+<nav class="aero-footer-nav">
+<a href="sitemap.html">网站地图</a>
+<a href="about.html">关于我们</a>
+<a href="terms.html">服务条款</a>
+<a href="privacy.html">隐私政策</a>
+</nav>
+<div class="aero-footer-copy">
+        © 2026 Mitce机场 版权所有. 保持超音速稳定互联.
       </div>
-    </div>
-  </header>
-
-  <div class="aero-container">
-    <div class="article-wrap">
-      <div class="crumb">
-        <a href="index.html">首页</a> &gt; <a href="telemetry.html">航线速报</a> &gt; 客户端</div>
-
-      <h1>跨平台客户端的配置同步：备份、导出与迁移</h1>
-      
-      <div class="meta-bar">
- <span>作者：Mitce 使用手记</span> <span>发布日期：2026-11-14</span> <span>分类：客户端</span> <span>阅读时长：约 5 分钟</span>
- </div>
-<p>设备一多，配置就容易出现“这台能用、那台不行”的情况。把它当成一份需要管理的文档，就清晰多了。</p>
-<h2>一、需要备份什么</h2>
-<ul><li>服务商提供的配置与你自己修改后的版本。</li><li>自定义的规则与分组设置。</li><li>客户端的主要选项，如模式、端口与开机自启。</li></ul>
-<h2>二、怎么备份</h2>
-<p>多数客户端支持导出配置文件。每次做较大的修改前先导出一份，文件名带上日期，保存在云盘或本地的固定文件夹。</p>
-<h2>三、跨设备迁移</h2>
-<p>在新设备上安装客户端，导入配置，再逐项核对规则与分组。不同平台的客户端选项不完全相同，迁移后要重新测试几个常用场景。</p>
-<h2>四、保持一致的小技巧</h2>
-<p>把规则单独维护成一份，各设备都引用同一份，修改一次，处处生效；个人的差异化设置另行记录。</p>
-<h2>五、版本管理</h2>
-<p>保留最近三个版本的配置。新配置出现问题，可以立即回退到上一版，而不是从零排查。</p>
- </div>
-  </div>
-
-  <footer class="aero-hangar-footer">
-    <div class="aero-container">
-      <nav class="aero-footer-nav">
-        <a href="sitemap.html">网站地图</a>
-        <a href="about.html">关于我们</a>
-        <a href="terms.html">服务条款</a>
-        <a href="privacy.html">隐私政策</a>
-      </nav>
-      <div class="aero-footer-copy">
-        &copy; 2026 Mitce机场 版权所有. 保持超音速稳定互联.
-      </div>
-    </div>
-  </footer>
-
+</div>
+</footer>
 </body>
 </html>
